@@ -37,10 +37,12 @@
 	<!-- A button for taking snaps -->
 	<form>
 		<input type=button value="Take Snapshot" onClick="take_snapshot()">
+		<input type=button value="Start video streaming" onClick="video_stream()"
 	</form>
 	
 	<!-- Code to handle taking the snapshot and displaying it locally -->
 	<script language="JavaScript">
+		var myInterval;
 		function take_snapshot() {
 			// take snapshot and get image data
 			Webcam.snap( function(data_uri) {
@@ -48,10 +50,22 @@
 				document.getElementById('results').innerHTML = 
 					'<h2>Here is your image:</h2>' + 
 					'<img src="'+data_uri+'"/>';
-				Webcam.upload( data_uri, 'http://127.0.0.1:5000/api', function(code, text) {
-					console.log(code)
-				} )
+				// Webcam.upload( data_uri, 'http://127.0.0.1:5000/api', function(code, text) {
+				// 	console.log(code)
+				// } )
 			} );
+		}
+
+		function video_stream() {
+			clearInterval(myInterval);
+			myInterval = setInterval(function(){
+				Webcam.snap( function(data_uri) {
+					// send 
+					Webcam.upload( data_uri, 'http://127.0.0.1:5000/api', function(code, text) {
+						console.log(code)
+					} )
+				} );
+			}, 100)
 		}
 	</script>
 	
