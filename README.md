@@ -14,6 +14,7 @@ Based on https://github.com/rwieruch/minimal-react-webpack-babel-setup
 ## Bugs
 1. SSL problem: not work on chrome and mobile.
 2. Need to kill the socket listener when blinking is detected, or it will keep sending unused package.
-3. Can not bear too many clients because the detector engine is too slow.
+3. When refreshing the pages, the server side will not remove that client.
+4. Can not bear too many clients because the detector engine is too slow.
 
 If you would like to have webpack rebuild your javascript any time your React code changes, enter `npm run start` in a different terminal.
