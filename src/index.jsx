@@ -62,12 +62,12 @@ class App extends React.Component {
             <div>
                 {this.id}
                 <div>My Flask React App !</div>
-                <Camera></Camera>
+                <Camera socket={this.socket}></Camera>
                 <input type="text" value={this.state.value} onChange={this.handleChange} />
                 <button onClick={this.handleSubmit}> click!</button>
                 other
                 <video ref={this.revRef} autoPlay> </video>
-                {this.state.id_list.map(item => (<li> {item} </li>))}
+                {this.state.id_list.map((item, i) => (<li key={i}> {item} </li>))}
             </div>
         );
     }
