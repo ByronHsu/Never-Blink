@@ -33,10 +33,10 @@ class Start extends React.Component {
             <Typography variant="h5" component="h3" color="textPrimary">
                 Blink Contest
             </Typography>
-            <Typography variant="body" component="p" color="textSecondary">
+            <Typography variant="body1" component="p" color="textSecondary">
                 Challenge a random player around the world.
             </Typography>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" color="primary" onClick={this.props.onClick}>
                 Connect
             </Button> 
             </Paper>

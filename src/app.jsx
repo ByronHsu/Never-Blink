@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Start from './start';
 import Play from './play';
+import uuidv4 from 'uuid/v4';
 
 const styles = () => ({
     root: {
@@ -28,15 +29,16 @@ class App extends React.Component {
     constructor(props) {
         super();
         this.props = props;
-        this.id = `${Date.now()}`;
+        this.id = uuidv4();
         this.peer = new Peer(this.id); 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
         this.onUnload = this.onUnload.bind(this);
 
-        this.state = {value: '', id_list: []}
+        this.state = {value: '', id_list: []};
+        this.socket = io(document.URL, {query: {id: this.id}});
         this.revRef = React.createRef();
-        this.socket = io(document.URL, {query: {id: this.id}})
         console.log('id', this.id);
     }
 
@@ -78,12 +80,16 @@ class App extends React.Component {
 
     handleChange(event) {
         this.setState({value: event.target.value});
-    }  
+    }
+    handleOnClick() {
+        console.log('handleOnClick!')
+        this.socket.emit('set_player', {'id': this.id})
+    }
     render() {
         const { classes } = this.props;
         return (
             <div>
-                <Start/>
+                <Start onClick={this.handleOnClick}/>
                 {/*
                 <Grid container justify="center" alignItems="center" className={classes.root}>
                     <Grid item>

@@ -8,36 +8,57 @@ import base64
 import io
 import cv2
 import numpy as np
+import random
 from detect import Eye_Detector
 
 app = Flask(__name__)
 socketio = SocketIO(app)
-id_list = []
+player_list = []
 detector = Eye_Detector()
 
+def find_by_id(_id):
+    filt = [i for (i, item) in enumerate(player_list) if item['id'] == _id]
+    index = None if len(filt) == 0 else filt[0]
+    return index
+
+def find_random_waiting(_id):
+    filt = [i for (i, item) in enumerate(player_list) if (item['status'] == 'waiting' and item['id'] != _id )]
+    if len(filt):
+      index = random.choice(filt)
+    else:
+      index = None
+    return index
 
 @socketio.on('connect')
 def on_connect():
-    # print(request)
     client_id = request.args['id']
-    if client_id not in id_list:
-        id_list.append(client_id)
+    index = find_by_id(client_id)
+    if not index:
+        player_list.append({'id': client_id, 'status': 'idle', 'ear': 0, 'rival': None})
     print(client_id, 'connected !')
-    # broadcast
-    socketio.emit('get_id_list', {'id_list': id_list})
-
 
 @socketio.on('disconnect')
 def _disconnect():
-    print('disconnect!')
+    pass
 
 @socketio.on('_disconnect')
 def on_disconnect(message):
     client_id = message['id']
-    id_list.remove(client_id)
+    index = find_by_id(client_id)
+    del player_list[index]
     print(client_id, 'disconnected !')
-    # broadcast
-    socketio.emit('get_id_list', {'id_list': id_list})
+
+@socketio.on('set_player')
+def set_player(message):
+    client_id = message['id']
+    curr_index = find_by_id(client_id)
+    player_list[index]['status'] = 'waiting'
+    rival_index = find_random_waiting(client_id)
+    print('rival_index', rival_index)
+    player_list[curr_index]['rival'] = rival_index
+    player_list[rival_index]['rival'] = curr_index
+
+    print(client_id, 'set to waiting...')
 
 @socketio.on('send_image')
 def handle_message(message):
