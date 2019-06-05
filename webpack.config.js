@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
     entry: [
-        './src/index.jsx'
+        './src/index.js'
     ],
     module: {
         rules: [
