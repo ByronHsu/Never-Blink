@@ -9,12 +9,24 @@ import io
 import cv2
 import numpy as np
 import random
+import time
+from flask_sslify import SSLify
 from detect import Eye_Detector
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 player_list = []
 detector = Eye_Detector()
+SSLify(app)
+
+# prevent cached responses(https://stackoverflow.com/questions/47376744/how-to-prevent-cached-response-flask-server-using-chrome)
+if app.config["DEBUG"]:
+    @app.after_request
+    def after_request(response):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
+        response.headers["Expires"] = 0
+        response.headers["Pragma"] = "no-cache"
+        return response
 
 def find_by_id(_id):
     filt = [i for (i, item) in enumerate(player_list) if item['id'] == _id]
@@ -34,8 +46,9 @@ def on_connect():
     client_id = request.args['id']
     index = find_by_id(client_id)
     if not index:
-        player_list.append({'id': client_id, 'status': 'idle', 'ear': 0, 'rival': None})
+        player_list.append({'id': client_id, 'status': 'idle', 'ear': 0, 'rival': None, 'startTime': 0, 'end': 0})
     print(client_id, 'connected !')
+
 
 @socketio.on('disconnect')
 def _disconnect():
@@ -52,13 +65,27 @@ def on_disconnect(message):
 def set_player(message):
     client_id = message['id']
     curr_index = find_by_id(client_id)
-    player_list[index]['status'] = 'waiting'
-    rival_index = find_random_waiting(client_id)
-    print('rival_index', rival_index)
-    player_list[curr_index]['rival'] = rival_index
-    player_list[rival_index]['rival'] = curr_index
-
+    player_list[curr_index]['status'] = 'waiting'
     print(client_id, 'set to waiting...')
+    # look for rival
+    rival_index = find_random_waiting(client_id)
+    if rival_index != None:
+      rival_id = player_list[rival_index]['id']
+      player_list[curr_index]['rival'] = rival_id
+      player_list[curr_index]['status'] = 'playing'
+      
+      player_list[rival_index]['rival'] = client_id
+      player_list[rival_index]['status'] = 'playing'
+
+      emit('get_rival', {'id': rival_id})
+      print(client_id, 'find rival', rival_id)
+
+@socketio.on('set_player_startTime')
+def set_player_startTime(message):
+    client_id = message['id']
+    curr_index = find_by_id(client_id)
+    player_list[curr_index]['startTime'] = time.time()
+    print('startTime', player_list[curr_index])
 
 @socketio.on('send_image')
 def handle_message(message):
@@ -69,34 +96,48 @@ def handle_message(message):
     args:
         message: Base64 string from client
     return:
-
+        emit arena status including ear1, ear2, now-time-stamp
     """
-    # print(message)
-    # input()
-    uri, time = message['uri'], message['time']
+    # print(message['id'])
+    uri, _id = message['uri'], message['id']
     # split header and body
     img_data = uri.split(',')[1]
     img_data = base64.b64decode(img_data)
     image = Image.open(io.BytesIO(img_data))
     # bgr
     array = np.array(image)
-    # array = cv2.resize(array, (0,0), fx=0.3, fy=0.3)
-    # print(array.shape)
-    ear = detector.calculate_ear(array)
-    print(ear)
-    if ear != 0: # not detect the eyes
-        socketio.emit('get_ear', {'ear': ear, 'time': time})
-    # convert decoded data to numpy array(rgb)
-    # array = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
-    # cv2.imwrite("filename.png", array)
-    # print(array.shape)
+    
+
+    REJECT = 0
+    # if ear1 <= REJECT: return
+    # set player's data
+    index = find_by_id(_id)
+    ear1 = player_list[index]['ear']
+    if player_list[index]['end'] == 0:
+      ear1 = detector.calculate_ear(array)
+      # if ear1 != 0:
+      player_list[index]['ear'] = ear1
+
+    rival_id = player_list[index]['rival']
+    rival_index = find_by_id(rival_id)
+    ear2 = player_list[rival_index]['ear']
+
+    elapsed = time.time() - player_list[index]['startTime']
+    
+    threshold = 0.25
+    if (ear1 < threshold or ear2 < threshold) and elapsed > 3:
+      player_list[index]['end'] = 1
+      player_list[index]['status'] = 'idle'
+      player_list[rival_index]['end'] = 1
+      player_list[rival_index]['status'] = 'idle'
+      emit('get_arena_data', {'ear1': ear1, 'ear2': ear2, 'elapsed': elapsed, 'end': 1})
+    else:
+      emit('get_arena_data', {'ear1': ear1, 'ear2': ear2, 'elapsed': elapsed, 'end': 0})
 
 @app.route("/")
 def index():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    # context = ('host.cert', 'host.key')
-    # app.run(host='0.0.0.0', port=3000, ssl_context = 'adhoc')
     # bug: https://stackoverflow.com/questions/51862313/navigator-getusermedia-not-working-on-android-chrome
-    socketio.run(app, host='0.0.0.0', port=3000)#, ssl_context='adhoc')# , keyfile='key.pem', certfile='cert.pem')
+    socketio.run(app, host='0.0.0.0', port=3000, keyfile='server.key', certfile='server.crt')
