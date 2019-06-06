@@ -123,9 +123,9 @@ def handle_message(message):
     ear2 = player_list[rival_index]['ear']
 
     elapsed = time.time() - player_list[index]['startTime']
-    
-    threshold = 0.25
-    if (ear1 < threshold or ear2 < threshold) and elapsed > 3:
+    print(player_list[index]['ear'], player_list[rival_index]['ear'])
+    threshold = 0.24
+    if ((ear1 < threshold and ear1 > 0) or (ear2 < threshold and ear2 > 0)) and elapsed > 3:
       player_list[index]['end'] = 1
       player_list[index]['status'] = 'idle'
       player_list[rival_index]['end'] = 1

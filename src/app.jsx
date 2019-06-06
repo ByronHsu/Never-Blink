@@ -21,6 +21,7 @@ class App extends React.Component {
           isPlaying: 0,
           role: '',
           rival_id: '',
+          connectToggle: false
         }
         this.tmp = 0
         console.log('id', this.id)
@@ -55,8 +56,12 @@ class App extends React.Component {
     }
 
     handleOnClick() {
-        console.log('handleOnClick!')
-        this.socket.emit('set_player', {'id': this.id})
+        console.log('handleOnClick!');
+        this.setState({connectToggle: 1});
+        setTimeout(() => {
+          this.socket.emit('set_player', {'id': this.id})
+        }, 1000)
+
     }
 
     handleStartOnClick() {
@@ -71,7 +76,7 @@ class App extends React.Component {
           {
             isPlaying ? 
               (<Play role={role} id={this.id} rival={rival_id} peer={this.peer} socket={this.socket} onClick={this.handleStartOnClick} tmp={this.tmp}/>) :
-              (<Start onClick={this.handleOnClick}/>)
+              (<Start onClick={this.handleOnClick} toggle={this.state.connectToggle}/>)
           }
           </div>
       );

@@ -4,6 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = () => ({
   container: {
@@ -23,7 +24,7 @@ class Start extends React.Component {
     this.props = props;
   }
   render(){
-    const {classes} = this.props;
+    const {classes, toggle} = this.props;
 
     return (
       <div>
@@ -33,12 +34,27 @@ class Start extends React.Component {
             <Typography variant="h5" component="h3" color="textPrimary">
                 Blink Contest
             </Typography>
-            <Typography variant="body1" component="p" color="textSecondary">
-                Challenge a random player around the world.
-            </Typography>
-            <Button variant="contained" color="primary" onClick={this.props.onClick}>
-                Connect
-            </Button> 
+
+            {
+              toggle? (
+                <React.Fragment>
+                <Typography variant="body1" component="p" color="textSecondary">
+                  Waiting for someone to join...
+                </Typography>
+                <CircularProgress/>
+                </React.Fragment>
+              ):(
+                <React.Fragment>
+                <Typography variant="body1" component="p" color="textSecondary">
+                  Challenge a random player around the world.
+                </Typography>
+                <Button variant="contained" color="primary" onClick={this.props.onClick}>
+                  Connect
+                </Button>
+                </React.Fragment>
+              )
+            }
+
             </Paper>
           </Grid>
         </Grid>
