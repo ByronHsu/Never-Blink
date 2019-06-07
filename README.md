@@ -1,4 +1,7 @@
 ## 1. 🎉 Introduction
+Randomly connect to a player around the world and challenge him/her!
+
+<img src="assets/out.gif"/>
 
 ## 2. 📜 Implementation
 
