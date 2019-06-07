@@ -185,6 +185,7 @@ def send_image(message):
     if player_list[index]['end'] == 0:
         EAR1 = detector.calculate_ear(array)
         player_list[index]['ear'] = EAR1
+        player_list[index]['uri'] = uri
 
     # Find rival's EAR.
     rival_id = player_list[index]['rival']
@@ -204,8 +205,8 @@ def send_image(message):
         player_list[index]['status'] = 'idle'
         player_list[rival_index]['end'] = 1
         player_list[rival_index]['status'] = 'idle'
-        emit('get_arena_data', {'EAR1': EAR1,
-                                'EAR2': EAR2, 'elapsed': elapsed, 'end': 1})
+        emit('get_arena_data', {'EAR1': EAR1, 'EAR2': EAR2, 'elapsed': elapsed, 'end': 1,
+                                'uri1': player_list[index]['uri'], 'uri2': player_list[rival_index]['uri']})
     else:
         emit('get_arena_data', {'EAR1': EAR1,
                                 'EAR2': EAR2, 'elapsed': elapsed, 'end': 0})

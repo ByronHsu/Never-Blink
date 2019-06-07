@@ -70,7 +70,9 @@ class Play extends React.Component {
       elapsed: 0, // The time passed from start.
       EAR1: 0, // Player's eye aspect ratio.
       EAR2: 0, // Rival's eye aspect ratio.
-      end: 0 // Whether the game has ended.
+      end: 0, // Whether the game has ended.
+      uri1: '', // Store the blinking image frame.
+      uri2: '' // Store the blinking image frame.
     };
     this.end = 0; // Synchornous version of 'this.state.end'
     this.refreshIntervalId = '';
@@ -103,12 +105,14 @@ class Play extends React.Component {
       // Use sync version of 'end' to determine whether to receive new data.
       if (this.end === 1) return;
       console.log('get_arena_data', data);
-      const { EAR1, EAR2, elapsed, end } = data;
+      const { EAR1, EAR2, elapsed, end, uri1, uri2 } = data;
       this.setState({
         EAR1,
         EAR2,
         elapsed,
-        end
+        end,
+        uri1,
+        uri2
       });
       if (end === 1) {
         // Set sync version of 'end' because 'this.state.end' will have a delay.
@@ -175,7 +179,7 @@ class Play extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { EAR1, EAR2, elapsed, end } = this.state;
+    const { EAR1, EAR2, elapsed, end, uri1, uri2 } = this.state;
 
     // Calculate EAR percent and progress bar color
     const ear1Percent = normalize(EAR1);
@@ -232,7 +236,11 @@ class Play extends React.Component {
                 percent={ear1Percent}
               />
               <Divider />
-              <video className={classes.video} ref={this.callRef} autoPlay />
+              {end ? (
+                <img src={uri1} alt="Can not access" />
+              ) : (
+                <video className={classes.video} ref={this.callRef} autoPlay />
+              )}
             </Paper>
           </Grid>
           <Grid item xs={6}>
@@ -245,7 +253,11 @@ class Play extends React.Component {
                 percent={ear2Percent}
               />
               <Divider />
-              <video className={classes.video} ref={this.recvRef} autoPlay />
+              {end ? (
+                <img src={uri2} alt="Can not access" />
+              ) : (
+                <video className={classes.video} ref={this.recvRef} autoPlay />
+              )}
             </Paper>
           </Grid>
 

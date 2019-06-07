@@ -1,10 +1,9 @@
-# Do-Not-Blink
-
 ## 1. 🎉 Introduction
 
 ## 2. 📜 Implementation
 
 ### 1. Project structure
+
 ```
 .
 ├── backend
@@ -25,6 +24,7 @@
 │   └── index.html
 └── webpack.config.js
 ```
+
 We use `react` as our frontend framework, and use `peerjs` to communicate between clients. At backend, we use `flask` to host the server. For connection between clients and server, we use `socketio` to implement real-time data transfer.
 
 <img src="assets/structure.png" width="500px">
@@ -68,6 +68,8 @@ Every time you changed your code, you should run the above command again. We do 
 4. Start and Enjoy
 
 Goto `https://0.0.0.0:3000`
+
+`0.0.0.0:3000` does not work, remember to add `https`.
 
 ## 4. 🚧 Problem
 

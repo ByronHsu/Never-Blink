@@ -40,7 +40,7 @@ class Start extends React.Component {
           <Grid item>
             <Paper className={classes.item}>
               <Typography variant="h5" component="h3" color="textPrimary">
-                Blink Contest
+                Never Blink
               </Typography>
 
               {toggle ? (
