@@ -43,7 +43,7 @@ const styles = theme => ({
   },
   video: {
     width: '100%',
-    margin: 2 * 8
+    margin: theme.spacing(2)
   }
 });
 
@@ -160,7 +160,7 @@ class Play extends React.Component {
 
   getScreenShot() {
     /**
-     * Send screenshot image from '<video>' and then send to the server at a certain frequency.
+     * Capture screenshot image from '<video>' and then send to the server at a certain frequency.
      */
     console.log('Play', 'getScreenShot');
     const { id, socket } = this.props;

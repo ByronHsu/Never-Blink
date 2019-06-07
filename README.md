@@ -1,21 +1,65 @@
-# minimal-flask-react
+# Do-Not-Blink
 
-Based on https://github.com/rwieruch/minimal-react-webpack-babel-setup
+## 1. 🎉 Introduction
 
-## Run Locally
+## 2. 📜 Implementation
 
-1. Clone this repo: `git clone git@github.com:jwkvam/minimal-flask-react.git`
-2. npm install
-3. npm run dev
-4. pip install -r requirements.txt
-5. python server.py
-6. Goto http://localhost:3000
+### 1. Structure
 
-## Bugs
-1. SSL problem: not work on chrome and mobile.
-2. Need to kill the socket listener when blinking is detected, or it will keep sending unused package.
-3. When refreshing the pages, the server side will not remove that client.
-4. Can not bear too many clients because the detector engine is too slow.
-5. When restarting, the media connection that should have been closed will be called again.
+We use `react` as our frontend framework, and use `peerjs` to communicate between clients. At backend, we use `flask` to host the server. For connection between clients and server, we use `socketio` to implement real-time data transfer.
 
-If you would like to have webpack rebuild your javascript any time your React code changes, enter `npm run start` in a different terminal.
+<img src="assets/structure.png" width="750px">
+
+### 2. Game State
+
+We use the notion of [Finite State Machine](https://zh.wikipedia.org/wiki/%E6%9C%89%E9%99%90%E7%8A%B6%E6%80%81%E6%9C%BA) to design our game state. The circle is the state. The text in the top of each box is the event causing state transition, and the text in the bottom of each box is the action taken when event occurs. The logic looks quite simple here, but it is not that easy to implement. For more detail you can check [play.jsx](./src/play.jsx) or [server.py](./src/server.py).
+
+<img src="assets/gamestate.png" width="750px">
+
+## 3. 💻 Development
+
+I spent lots of time formatting my code and writing comments to make it as readable as possible. Hope you enjoy 😊
+
+1. Clone this repo.
+
+```bash
+git clone git@github.com:andyh0913/blink_contest.git
+```
+
+2. Install the packages
+
+```bash
+# Frontend
+npm install
+# Backend
+pip install -r requirement.txt
+```
+
+3. Build and Run
+
+```bash
+# Build frontend files
+npm run build
+# Run server
+npm run start
+```
+
+Every time you changed your code, you should run the above command again. We do not support hot module replacement now.
+
+4. Start and Enjoy
+
+Goto `https://0.0.0.0:3000`
+
+## 4. 🚧 Problem
+
+1. **Can not endure too many clients because the detector engine is too weak and slow**.
+2. When restarting, the old media connection listener will be called again. So we remove restart temporarily.
+
+## 5. 📖 Reference
+
+1. Environment setup: https://github.com/rwieruch/minimal-react-webpack-babel-setup
+2. Simple P2P WebRTC package: https://github.com/peers/peerjs
+3. Socket-io: https://socket.io/docs/client-api/
+4. Flask-socketio: https://flask-socketio.readthedocs.io/en/latest/
+5. Blink detector: https://github.com/dilawar/eye-blink-detector
+6. Material UI: https://material-ui.com/

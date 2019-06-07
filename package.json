@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "webpack --mode development",
-    "start": "webpack --mode development --watch",
+    "build": "webpack --mode development",
+    "start": "python3 server.py",
     "precommit": "NODE_ENV=production lint-staged"
   },
   "keywords": [],
@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.0.2",
+    "@material-ui/icons": "^4.0.1",
     "axios": "^0.19.0",
     "peerjs": "^1.0.0",
     "rc-progress": "^2.3.0",
