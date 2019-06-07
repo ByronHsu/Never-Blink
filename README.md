@@ -52,8 +52,10 @@ Goto `https://0.0.0.0:3000`
 
 ## 4. 🚧 Problem
 
-1. **Can not endure too many clients because the detector engine is too weak and slow**.
+1. **Can not endure too many clients because the detector engine is too weak and slow.**
 2. When restarting, the old media connection listener will be called again. So we remove restart temporarily.
+3. The server can not endure too much flow at a time. So that we currently do not deploy it to a public server.
+4. **Need a robust and fast blink detect model**(Can anyone provide? 😭)
 
 ## 5. 📖 Reference
 
