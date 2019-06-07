@@ -10,6 +10,7 @@ import imutils
 import time
 import dlib
 import cv2
+import os
 
 
 def eye_aspect_ratio(eye):
@@ -25,8 +26,11 @@ def eye_aspect_ratio(eye):
     # return the eye aspect ratio
     return ear
 
+
 threshold = 0.27
-shape_predictor = "shape_predictor_68_face_landmarks.dat"
+shape_predictor = os.path.join(
+    'backend', "shape_predictor_68_face_landmarks.dat")
+
 
 class Eye_Detector():
     def __init__(self):
@@ -36,6 +40,7 @@ class Eye_Detector():
         (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
         (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
         self.index = [lStart, lEnd, rStart, rEnd]
+
     def calculate_ear(self, frame):
         lStart, lEnd, rStart, rEnd = self.index
         detector, predictor = self.detector, self.predictor
@@ -58,5 +63,4 @@ class Eye_Detector():
             rightEAR = eye_aspect_ratio(rightEye)
             # average the eye aspect ratio together for both eyes
             ear = (leftEAR + rightEAR) / 2.0
-        return ear 
-
+        return ear

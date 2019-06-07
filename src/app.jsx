@@ -1,86 +1,106 @@
+/* eslint-disable no-console */
 import React from 'react';
 import Peer from 'peerjs';
 import io from 'socket.io-client';
+import uuidv4 from 'uuid/v4';
 import Start from './start';
 import Play from './play';
-import uuidv4 from 'uuid/v4';
 
 class App extends React.Component {
-    constructor(props) {
-        super();
-        this.props = props;
-        this.id = uuidv4();
-        this.rival_id = ''
-        this.peer = new Peer(this.id); 
-        this.socket = io(document.URL, {query: {id: this.id}});
-        // function bind
-        this.handleOnClick = this.handleOnClick.bind(this);
-        this.handleStartOnClick = this.handleStartOnClick.bind(this);
-        this.onUnload = this.onUnload.bind(this);
-        this.state = {
-          isPlaying: 0,
-          role: '',
-          rival_id: '',
-          connectToggle: false
-        }
-        this.tmp = 0
-        console.log('id', this.id)
-    }
+  constructor(props) {
+    super();
+    this.props = props;
 
-    componentDidMount() {
-        console.log('componentDidMount')
-        // delete this client in server before close page. 
-        window.addEventListener('beforeunload', this.onUnload, false);
-        // connect side
-        this.socket.on('get_rival', (data) => {
-            this.rival_id = data['id'];
-            const conn = this.peer.connect(this.rival_id);
-            conn.on('open', () => {
-              conn.send(this.id);
-              console.log('connect side sends peer data');
-            });
-            this.setState({isPlaying: 1, role: 'call', rival_id: this.rival_id});
-        });
-        // receiver side
-        this.peer.on('connection', (conn) => {
-          conn.on('data', (data) => {
-            this.rival_id = data;
-            console.log('receiver side receives peer data');
-          });
-          this.setState({isPlaying: 1, role: 'recv', rival_id: this.rival_id});
-        });
-    }
+    // Create client id.
+    this.id = uuidv4();
 
-    onUnload() {
-        this.socket.emit('_disconnect', {'id': this.id})
-    }
+    // Create peer and socket to communicate.
+    this.peer = new Peer(this.id);
+    this.socket = io(document.URL, { query: { id: this.id } });
 
-    handleOnClick() {
-        console.log('handleOnClick!');
-        this.setState({connectToggle: 1});
-        setTimeout(() => {
-          this.socket.emit('set_player', {'id': this.id})
-        }, 1000)
+    // Function bind.
+    this.handleOnClick = this.handleOnClick.bind(this);
+    this.onUnload = this.onUnload.bind(this);
 
-    }
+    // Define state and other member variable.
+    this.state = {
+      isPlaying: 0,
+      role: '',
+      rivalId: '',
+      connectToggle: false
+    };
+    this.rivalId = '';
 
-    handleStartOnClick() {
-        this.setState({isPlaying: 0});
-    }
+    console.log('id', this.id);
+  }
 
-    render() {
-      const {isPlaying, role, rival_id} = this.state;
-      this.tmp += 1;
-      return (
-          <div>
-          {
-            isPlaying ? 
-              (<Play role={role} id={this.id} rival={rival_id} peer={this.peer} socket={this.socket} onClick={this.handleStartOnClick} tmp={this.tmp}/>) :
-              (<Start onClick={this.handleOnClick} toggle={this.state.connectToggle}/>)
-          }
-          </div>
-      );
-    }
+  componentDidMount() {
+    console.log('app', 'componentDidMount');
+
+    // FIXME: Flask-socketio 'disconnect' event can not be triggered immediately.
+    //        Therefore, we use some trick to replace the 'disconnect' event.
+    window.addEventListener('beforeunload', this.onUnload, false);
+
+    /**
+     * [For connect side]
+     * After this client receive its rival's id from the server,
+     * it will use 'peer' to inform its rival that the game is about to start.
+     */
+    this.socket.on('get_rival', data => {
+      this.rivalId = data.id;
+      const conn = this.peer.connect(this.rivalId);
+      conn.on('open', () => {
+        conn.send(this.id);
+        console.log('connect side sends peer data');
+      });
+      this.setState({ isPlaying: 1, role: 'call', rivalId: this.rivalId });
+    });
+
+    /**
+     * [For receiver side]
+     * It will receive rival's id from connect side.
+     */
+    this.peer.on('connection', conn => {
+      conn.on('data', data => {
+        this.rivalId = data;
+        console.log('receiver side receives peer data');
+      });
+      this.setState({ isPlaying: 1, role: 'recv', rivalId: this.rivalId });
+    });
+  }
+
+  onUnload() {
+    // Delete this client in server side.
+    this.socket.emit('_disconnect', { id: this.id });
+  }
+
+  handleOnClick() {
+    this.setState({ connectToggle: 1 });
+
+    // Use 'settimeout' because we do not wish that the player connects to the other player too fast.
+    setTimeout(() => {
+      this.socket.emit('set_player_wait', { id: this.id });
+    }, 1000);
+  }
+
+  render() {
+    const { isPlaying, role, rivalId, connectToggle } = this.state;
+    return (
+      <React.Fragment>
+        {isPlaying ? (
+          <Play
+            role={role}
+            id={this.id}
+            rival={rivalId}
+            peer={this.peer}
+            socket={this.socket}
+          />
+        ) : (
+          <Start handleOnClick={this.handleOnClick} toggle={connectToggle} />
+        )}
+      </React.Fragment>
+    );
+  }
 }
 
 export default App;

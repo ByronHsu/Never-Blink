@@ -1,65 +1,82 @@
 import React from 'react';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import { withStyles } from '@material-ui/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import {
+  Paper,
+  Typography,
+  Button,
+  Grid,
+  CircularProgress
+} from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import { grey } from '@material-ui/core/colors';
 
-const styles = () => ({
+const styles = theme => ({
   container: {
-    // JSS uses px as the default units for this CSS property.
     height: '100vh',
-    backgroundColor: '#f5f5f5'
+    backgroundColor: grey[100]
   },
   item: {
-    padding: 8 * 2,
+    padding: theme.spacing(2),
     textAlign: 'center'
   }
 });
 
 class Start extends React.Component {
-  constructor(props){
+  constructor(props) {
     super();
     this.props = props;
   }
-  render(){
-    const {classes, toggle} = this.props;
+
+  render() {
+    const { classes, toggle, handleOnClick } = this.props;
 
     return (
-      <div>
-        <Grid container justify="center" alignItems="center"  className={classes.container}>
+      <React.Fragment>
+        <Grid
+          container
+          justify="center"
+          alignItems="center"
+          className={classes.container}
+        >
           <Grid item>
             <Paper className={classes.item}>
-            <Typography variant="h5" component="h3" color="textPrimary">
+              <Typography variant="h5" component="h3" color="textPrimary">
                 Blink Contest
-            </Typography>
+              </Typography>
 
-            {
-              toggle? (
+              {toggle ? (
                 <React.Fragment>
-                <Typography variant="body1" component="p" color="textSecondary">
-                  Waiting for someone to join...
-                </Typography>
-                <CircularProgress/>
+                  <Typography
+                    variant="body1"
+                    component="p"
+                    color="textSecondary"
+                  >
+                    Waiting for someone to join...
+                  </Typography>
+                  <CircularProgress />
                 </React.Fragment>
-              ):(
+              ) : (
                 <React.Fragment>
-                <Typography variant="body1" component="p" color="textSecondary">
-                  Challenge a random player around the world.
-                </Typography>
-                <Button variant="contained" color="primary" onClick={this.props.onClick}>
-                  Connect
-                </Button>
+                  <Typography
+                    variant="body1"
+                    component="p"
+                    color="textSecondary"
+                  >
+                    Challenge a random player around the world.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOnClick}
+                  >
+                    Connect
+                  </Button>
                 </React.Fragment>
-              )
-            }
-
+              )}
             </Paper>
           </Grid>
         </Grid>
-      </div>
-    )
+      </React.Fragment>
+    );
   }
 }
 

@@ -1,230 +1,258 @@
+/* eslint-disable jsx-a11y/media-has-caption */
+/* eslint-disable no-console */
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { withStyles } from '@material-ui/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
-import { Line, Circle } from 'rc-progress';
+import { Line } from 'rc-progress';
 import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
 import green from '@material-ui/core/colors/green';
-import Box from '@material-ui/core/Box';
 import grey from '@material-ui/core/colors/grey';
 
-const styles = () => ({
-  root:{
-    backgroundColor: '#f5f5f5',
+const styles = theme => ({
+  root: {
+    backgroundColor: grey[100],
     height: '100vh'
   },
-  container:{
-    padding: 2*8,
+  container: {
+    padding: theme.spacing(2)
   },
-  header:{
+  header: {
     textAlign: 'center',
-    padding: 2*8,
+    padding: theme.spacing(2)
   },
-  timer:{
-    backgroundColor: grey[900],
+  timer: {
+    backgroundColor: grey[800],
     color: grey[50],
-    padding: 1*8
+    padding: theme.spacing(1)
   },
-  countdown:{
-    color: red[500],
+  countdown: {
+    color: red[500]
   },
-  frameHeader:{
-    // textAlign: 'center',
-    padding: 2*8,
+  frameHeader: {
+    padding: theme.spacing(2)
   },
-  frame:{
-    padding: 4*8,
-    // textAlign: 'center'
+  frame: {
+    padding: theme.spacing(4)
   },
-  footer:{
+  footer: {
     textAlign: 'center'
   },
-  video:{
+  video: {
     width: '100%',
-    margin: 2*8
+    margin: 2 * 8
   }
 });
 
+// Utils function
+const normalize = x => {
+  const threshold = 0.24;
+  const upper = 0.35;
+  const result = ((x - threshold) / (upper - threshold)) * 100;
+  if (result < 0) return 0;
+  return result;
+};
 class Play extends React.Component {
-  constructor(props){
+  constructor(props) {
     super();
     this.props = props;
     this.callRef = React.createRef();
     this.recvRef = React.createRef();
-    // function bind
+
+    // Function bind.
     this.getScreenShot = this.getScreenShot.bind(this);
+
+    // Define state and varible.
     this.state = {
-      elapsed: 0,
-      ear1: 0,
-      ear2: 0,
-      end: 0,
-    }
-    this.end = 0
-    this.refreshIntervalId = ''
-    this.color = [red[500], yellow[500], green[500]];
-    console.log(this.color);
+      elapsed: 0, // The time passed from start.
+      EAR1: 0, // Player's eye aspect ratio.
+      EAR2: 0, // Rival's eye aspect ratio.
+      end: 0 // Whether the game has ended.
+    };
+    this.end = 0; // Synchornous version of 'this.state.end'
+    this.refreshIntervalId = '';
+    this.progressColor = [red[500], yellow[500], green[500]]; // Different stage's color for the progress bar.
   }
-  componentWillUnmount(){
-    this.callClose()
-  }
-  componentDidMount(){
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-    console.log('Play', 'didmount', this.recvRef)
+
+  componentDidMount() {
+    console.log('Play', 'componentdidmount');
+
+    navigator.getUserMedia =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia;
+
     // Set up self media streaming (https://www.html5rocks.com/en/tutorials/getusermedia/intro/)
-    if(navigator.getUserMedia){
-      navigator.mediaDevices.getUserMedia({video: true}).
-      then((stream) => {
+    if (navigator.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
         this.callRef.current.srcObject = stream;
-        window.localStream = stream
-      })
+        window.localStream = stream;
+      });
     }
 
-    const {role, id, rival, peer, socket} = this.props
-    //get arena data
+    const { role, id, rival, peer, socket } = this.props;
 
-    socket.on('get_arena_data', (data) => {
-      // console.log(data);
-      if(this.end == 1) return;
-      let {ear1, ear2, elapsed, end} = data;
-      let ear1_f = ear1.toFixed(2);
-      let ear2_f = ear2.toFixed(2);
-      let elapsed_f = elapsed.toFixed(0);
-      console.log(data);
-      console.log(this.end);
-      if(end == 0){
-        this.setState({
-          ear1: ear1_f, ear2: ear2_f, elapsed: elapsed_f, end: end
-        })
-      }else{
-        // ear1_f = (ear1 > ear2)? 'Win': 'Lose';
-        // ear2_f = (ear2 > ear1)? 'Win': 'Lose';
-        this.setState({
-          ear1: ear1_f, ear2: ear2_f, elapsed: elapsed_f, end: end
-        })
-        this.end = end
+    /**
+     * [Get arena data]
+     * Receive data from the server side.
+     */
+    socket.on('get_arena_data', data => {
+      // Use sync version of 'end' to determine whether to receive new data.
+      if (this.end === 1) return;
+      console.log('get_arena_data', data);
+      const { EAR1, EAR2, elapsed, end } = data;
+      this.setState({
+        EAR1,
+        EAR2,
+        elapsed,
+        end
+      });
+      if (end === 1) {
+        // Set sync version of 'end' because 'this.state.end' will have a delay.
+        this.end = end;
+        // Stop sending screenshots to server.
         clearInterval(this.refreshIntervalId);
-        console.log('end!')
       }
-    })
+    });
 
-    //answer
-    if(role == 'recv'){
-      peer.on('call', (call) => {
-        call.answer(window.localStream); // Answer the call with an A/V stream.
-        console.log('peer', 'on', this.recvRef)
-        call.on('stream', (remoteStream) => {
-            // Show stream in some <video> element.
-            if(this.recvRef.current){
-              this.recvRef.current.srcObject = remoteStream;
-              socket.emit('set_player_startTime', {id: id});
-              this.refreshIntervalId = setInterval(this.getScreenShot, 300);
-            }
+    const sendRate = 300; // send every 300 ms
+    /**
+     * [Media stream, receiver side]
+     * https://github.com/peers/peerjs
+     */
+    if (role === 'recv') {
+      peer.on('call', call => {
+        call.answer(window.localStream);
+
+        call.on('stream', remoteStream => {
+          if (this.recvRef.current) {
+            this.recvRef.current.srcObject = remoteStream;
+            socket.emit('set_player_startTime', { id });
+            this.refreshIntervalId = setInterval(this.getScreenShot, sendRate);
+          }
         });
       });
     }
-    //call
-    if(role == 'call'){
+
+    /**
+     * [Media stream, caller side]
+     * https://github.com/peers/peerjs
+     */
+    if (role === 'call') {
       const callRival = () => {
         const call = peer.call(rival, window.localStream);
-        call.on('stream', (remoteStream) => {
-            // console.log(remoteStream); 
-            // Show stream in some <video> element.
-            this.recvRef.current.srcObject = remoteStream;
-            socket.emit('set_player_startTime', {id: id});
-            this.refreshIntervalId = setInterval(this.getScreenShot, 300);
+        call.on('stream', remoteStream => {
+          this.recvRef.current.srcObject = remoteStream;
+          socket.emit('set_player_startTime', { id });
+          this.refreshIntervalId = setInterval(this.getScreenShot, sendRate);
         });
-      }
-      // wait for the set up of recv side
-      setTimeout(callRival, 3000)
+      };
+
+      const setupTime = 3000; // 3000 ms
+
+      // Wait for the set up of recv side.
+      setTimeout(callRival, setupTime);
     }
   }
+
   getScreenShot() {
-    console.log('getScreenShot');
-    const {id, socket} = this.props;
-    // console.log('screenshot')
+    /**
+     * Send screenshot image from '<video>' and then send to the server at a certain frequency.
+     */
+    console.log('Play', 'getScreenShot');
+    const { id, socket } = this.props;
     const canvas = document.createElement('canvas');
     canvas.width = this.callRef.current.videoWidth;
     canvas.height = this.callRef.current.videoHeight;
     canvas.getContext('2d').drawImage(this.callRef.current, 0, 0);
-    const data_uri = canvas.toDataURL('image/webp');
-    // this.imageRef.current.src = data_uri;
-    socket.emit('send_image', {uri: data_uri, id: id})
-  }
-  render(){
-    const {classes} = this.props;
-    let {ear1, ear2, elapsed, end} = this.state;
-    let ear1_percent = (ear1 - 0.24) / (0.35 - 0.24) * 100
-    let ear2_percent = (ear2 - 0.24) / (0.35 - 0.24) * 100
-    if(ear1_percent < 0) ear1_percent = 0
-    if(ear2_percent < 0) ear2_percent = 0
-    const ear1_color = this.color[Math.round(ear1_percent / 33)]
-    const ear2_color = this.color[Math.round(ear2_percent / 33)]
-    console.log('ear1_percent', ear1_percent, 'ear2_percent', ear2_percent)
-    let m, s, countdown;
-    const elapsed_shift = elapsed - 3;
-    let timer = null;
-    if(elapsed_shift < 0){
-      countdown = Math.round(-elapsed_shift)
-      timer = (
-        <Typography variant="h2" component="span" className={classes.countdown}>
-        {countdown}
-        </Typography>
-      )
-    }else{
-      m = Math.round(elapsed_shift / 60).toString().padStart(2, '0'); 
-      s = Math.round(Math.round(elapsed_shift) % 60).toString().padStart(2, '0');
-      let message = ''
-      if(end == 1){
-        message = ear1 < ear2? 'WIN' : 'LOSE'
-      }
 
-      timer = (
-        <Typography variant="h4" component="span" className={classes.timer}>
-        {m}:{s} {message} 
-        </Typography>
-      )
+    const dataUri = canvas.toDataURL('image/webp');
+    socket.emit('send_image', { uri: dataUri, id });
+  }
+
+  render() {
+    const { classes } = this.props;
+    const { EAR1, EAR2, elapsed, end } = this.state;
+
+    // Calculate EAR percent and progress bar color
+    const ear1Percent = normalize(EAR1);
+    const ear2Percent = normalize(EAR2);
+    const ear1Color = this.progressColor[Math.round(ear1Percent / 33)];
+    const ear2Color = this.progressColor[Math.round(ear2Percent / 33)];
+    console.log('ear1Percent', ear1Percent, 'ear2Percent', ear2Percent);
+
+    // Calculate timer
+    // The game starts after 3 second of countdown.
+    const prepareTime = 3;
+
+    const counter = elapsed - prepareTime;
+    const min = Math.round(counter / 60)
+      .toString()
+      .padStart(2, '0');
+    const sec = Math.round(Math.round(counter) % 60)
+      .toString()
+      .padStart(2, '0');
+    let message = '';
+    if (counter < 0) {
+      // countdown
+      message = Math.round(-counter);
+    } else {
+      // start timer
+      message = `${min} : ${sec}`;
+      if (end === 1) {
+        if (EAR1 > EAR2) message += ' WIN';
+        else message += ' LOSE';
+      }
     }
+
     return (
       <div className={classes.root}>
-      <Grid container justify="space-around" spacing={3} className={classes.container}>
-        <Grid item xs={12} className={classes.header}>
-          {timer}
-        </Grid>
-        <Grid item xs={6}>
-          <Paper className={classes.frame}>
-          
-          <Typography variant="h4">
-          HP
-          </Typography>
-          
-          <Line strokeWidth="2" trailWidth="2" strokeColor={ear1_color} percent={ear1_percent} />
-          <Divider />
-          <video className={classes.video} ref={this.callRef} autoPlay/>
-          </Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper className={classes.frame}>
-          <Typography variant="h4">
-          HP
-          </Typography>
-          <Line strokeWidth="2" trailWidth="2" strokeColor={ear2_color} percent={ear2_percent}/>
-          <Divider />
-          <video className={classes.video} ref={this.recvRef} autoPlay/>
-          </Paper>
-        </Grid>
+        <Grid
+          container
+          justify="space-around"
+          spacing={3}
+          className={classes.container}
+        >
+          <Grid item xs={12} className={classes.header}>
+            <Typography variant="h4" component="span" className={classes.timer}>
+              {message}
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.frame}>
+              <Typography variant="h4">HP</Typography>
 
-        <Grid item xs={12} className={classes.footer}>
-            {/*<Button variant="contained" color="primary" size="large" onClick={this.props.onClick}>
-              Restart
-          </Button>*/}
+              <Line
+                strokeWidth="2"
+                trailWidth="2"
+                strokeColor={ear1Color}
+                percent={ear1Percent}
+              />
+              <Divider />
+              <video className={classes.video} ref={this.callRef} autoPlay />
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.frame}>
+              <Typography variant="h4">HP</Typography>
+              <Line
+                strokeWidth="2"
+                trailWidth="2"
+                strokeColor={ear2Color}
+                percent={ear2Percent}
+              />
+              <Divider />
+              <video className={classes.video} ref={this.recvRef} autoPlay />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} className={classes.footer}></Grid>
         </Grid>
-      </Grid>
       </div>
-    )
+    );
   }
 }
 
