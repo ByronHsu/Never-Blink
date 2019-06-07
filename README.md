@@ -4,8 +4,27 @@
 
 ## 2. 📜 Implementation
 
-### 1. Structure
-
+### 1. Project structure
+```
+.
+├── backend
+│   ├── __init__.py
+│   ├── detect.py
+│   └── shape_predictor_68_face_landmarks.dat (detect model)
+├── package.json
+├── requirements.txt
+├── server.py
+├── src
+│   ├── app.jsx
+│   ├── index.js
+│   ├── play.jsx
+│   └── start.jsx
+├── static
+│   └── bundle.js
+├── templates
+│   └── index.html
+└── webpack.config.js
+```
 We use `react` as our frontend framework, and use `peerjs` to communicate between clients. At backend, we use `flask` to host the server. For connection between clients and server, we use `socketio` to implement real-time data transfer.
 
 <img src="assets/structure.png" width="500px">
