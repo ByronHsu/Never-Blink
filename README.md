@@ -8,13 +8,13 @@
 
 We use `react` as our frontend framework, and use `peerjs` to communicate between clients. At backend, we use `flask` to host the server. For connection between clients and server, we use `socketio` to implement real-time data transfer.
 
-<img src="assets/structure.png" width="750px">
+<img src="assets/structure.png" width="500px">
 
 ### 2. Game State
 
 We use the notion of [Finite State Machine](https://zh.wikipedia.org/wiki/%E6%9C%89%E9%99%90%E7%8A%B6%E6%80%81%E6%9C%BA) to design our game state. The circle is the state. The text in the top of each box is the event causing state transition, and the text in the bottom of each box is the action taken when event occurs. The logic looks quite simple here, but it is not that easy to implement. For more detail you can check [play.jsx](./src/play.jsx) or [server.py](./src/server.py).
 
-<img src="assets/gamestate.png" width="750px">
+<img src="assets/gamestate.png" width="500px">
 
 ## 3. 💻 Development
 
