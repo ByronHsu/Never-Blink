@@ -1,4 +1,11 @@
+# Never-Blink
+
+<div style="text-align:center">
+<img src="assets/logo.png" width="300px">
+</div>
+
 ## 1. 🎉 Introduction
+
 Randomly connect to a player around the world and challenge him/her!
 
 <img src="assets/out.gif"/>
