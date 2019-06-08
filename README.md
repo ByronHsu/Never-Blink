@@ -1,8 +1,8 @@
 # Never-Blink
 
-<div style="text-align:center">
+<p align="center">
 <img src="assets/logo.png" width="300px">
-</div>
+</p>
 
 ## 1. 🎉 Introduction
 
