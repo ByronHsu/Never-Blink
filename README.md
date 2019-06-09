@@ -6,7 +6,7 @@
 
 ## 1. 🎉 Introduction
 
-Randomly connect to a player around the world and challenge him/her!
+Randomly connect to a player around the world and challenge him/her. Remember not to blink!
 
 <img src="assets/out.gif"/>
 
@@ -83,10 +83,8 @@ Goto `https://0.0.0.0:3000`
 
 ## 4. 🚧 Problem
 
-1. **Can not endure too many clients because the detector engine is too weak and slow.**
+1. Becausee the detector is too slow and weak, we can not afford too many clients so that we do not deploy it to a public server now. We plan to train a robust and fast model in the future.
 2. When restarting, the old media connection listener will be called again. So we remove restart temporarily.
-3. The server can not endure too much flow at a time. So that we currently do not deploy it to a public server.
-4. **Need a robust and fast blink detect model**(Can anyone provide? 😭)
 
 ## 5. 📖 Reference
 

@@ -17,6 +17,9 @@ const styles = theme => ({
   item: {
     padding: theme.spacing(2),
     textAlign: 'center'
+  },
+  logo: {
+    width: '100px'
   }
 });
 
@@ -39,10 +42,14 @@ class Start extends React.Component {
         >
           <Grid item>
             <Paper className={classes.item}>
+              <img
+                className={classes.logo}
+                src="https://i.imgur.com/Tm6mUuM.png"
+                alt="Can not access"
+              />
               <Typography variant="h5" component="h3" color="textPrimary">
                 Never Blink
               </Typography>
-
               {toggle ? (
                 <React.Fragment>
                   <Typography
