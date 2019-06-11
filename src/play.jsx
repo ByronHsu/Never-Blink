@@ -44,12 +44,16 @@ const styles = theme => ({
   video: {
     width: '100%',
     margin: theme.spacing(2)
+  },
+  image: {
+    width: '100%',
+    margin: theme.spacing(2)
   }
 });
 
 // Utils function
 const normalize = x => {
-  const threshold = 0.24;
+  const threshold = 0.2;
   const upper = 0.35;
   const result = ((x - threshold) / (upper - threshold)) * 100;
   if (result < 0) return 0;
@@ -237,7 +241,11 @@ class Play extends React.Component {
               />
               <Divider />
               {end ? (
-                <img src={uri1} alt="Can not access" />
+                <img
+                  className={classes.image}
+                  src={uri1}
+                  alt="Can not access"
+                />
               ) : (
                 <video className={classes.video} ref={this.callRef} autoPlay />
               )}
@@ -254,7 +262,11 @@ class Play extends React.Component {
               />
               <Divider />
               {end ? (
-                <img src={uri2} alt="Can not access" />
+                <img
+                  className={classes.image}
+                  src={uri2}
+                  alt="Can not access"
+                />
               ) : (
                 <video className={classes.video} ref={this.recvRef} autoPlay />
               )}

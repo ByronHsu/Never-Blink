@@ -83,7 +83,7 @@ Goto `https://0.0.0.0:3000`
 
 ## 4. 🚧 Problem
 
-1. Becausee the detector is too slow and weak, we can not afford too many clients so that we do not deploy it to a public server now. We plan to train a robust and fast model in the future.
+1. Becausee the detector is too slow and weak, we can not endure too many clients. Therefore, we do not deploy it to a public server now. We plan to train a robust and fast model in the future.
 2. When restarting, the old media connection listener will be called again. So we remove restart temporarily.
 
 ## 5. 📖 Reference

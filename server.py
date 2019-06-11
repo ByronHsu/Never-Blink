@@ -196,7 +196,7 @@ def send_image(message):
     elapsed = time.time() - player_list[index]['startTime']
 
     # EAR < threshold is determined as 'blink'.
-    threshold = 0.24
+    threshold = 0.20
     # The first 3 second is not counted.
     prepare_time = 3
     if ((EAR1 < threshold and EAR1 > 0) or (EAR2 < threshold and EAR2 > 0)) and elapsed > prepare_time:
