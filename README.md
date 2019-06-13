@@ -7,7 +7,8 @@
 ## 1. 🎉 Introduction
 
 Randomly connect to a player around the world and challenge him/her. Remember not to blink!
-[Full Version of Demo Video](https://www.youtube.com/watch?v=VCP36k5OqDs&t=59s)
+
+For full version of demo video, click [here](https://www.youtube.com/watch?v=VCP36k5OqDs&t=59s).
 
 <img src="assets/out.gif"/>
 
