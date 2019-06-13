@@ -96,4 +96,4 @@ Goto `https://0.0.0.0:3000`
 6. Material UI: https://material-ui.com/
 
 ## 6. 🗞️ License
-[License](./License)
+[MIT Licensed](./License)
