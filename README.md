@@ -94,3 +94,6 @@ Goto `https://0.0.0.0:3000`
 4. Flask-socketio: https://flask-socketio.readthedocs.io/en/latest/
 5. Blink detector: https://github.com/dilawar/eye-blink-detector
 6. Material UI: https://material-ui.com/
+
+## 6. 🗞️ License
+[License](./License)
