@@ -10,6 +10,8 @@ Randomly connect to a player around the world and challenge him/her. Remember no
 
 <img src="assets/out.gif"/>
 
+[Full Version of Demo Video](https://www.youtube.com/watch?v=VCP36k5OqDs&t=59s)
+
 ## 2. 📜 Implementation
 
 ### 1. Project structure
