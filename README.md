@@ -65,7 +65,7 @@ git clone git@github.com:andyh0913/blink_contest.git
 # Frontend
 npm install
 # Backend
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 3. Build and Run
