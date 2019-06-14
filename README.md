@@ -6,6 +6,8 @@
 
 ## 1. 🎉 Introduction
 
+🙌 Upvote for my [product hunt](https://www.producthunt.com/posts/never-blink)!
+
 Randomly connect to a player around the world and challenge him/her. Remember not to blink!
 
 For full version of demo video, click [here](https://www.youtube.com/watch?v=VCP36k5OqDs&t=59s).
@@ -98,4 +100,5 @@ Goto `https://0.0.0.0:3000`
 6. Material UI: https://material-ui.com/
 
 ## 6. 🗞️ License
+
 [MIT Licensed](./License)
