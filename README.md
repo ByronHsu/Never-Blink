@@ -56,7 +56,7 @@ I spent lots of time formatting my code and writing comments to make it as reada
 1. Clone this repo.
 
 ```bash
-git clone git@github.com:andyh0913/blink_contest.git
+git clone git@github.com:ByronHsu/Never-Blink.git
 ```
 
 2. Install the packages
