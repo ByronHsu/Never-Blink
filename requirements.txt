@@ -6,4 +6,4 @@ opencv_python==3.4.2.16
 numpy==1.15.0
 imutils==0.5.2
 Flask_SocketIO==4.0.0
-Pillow==6.0.0
+Pillow==8.1.1
