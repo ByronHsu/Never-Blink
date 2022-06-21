@@ -3,7 +3,7 @@ scipy==1.1.0
 Flask_SSLify==0.1.5
 dlib==19.17.0
 opencv_python==3.4.2.16
-numpy==1.15.0
+numpy==1.22.0
 imutils==0.5.2
 Flask_SocketIO==4.0.0
 Pillow==6.0.0
